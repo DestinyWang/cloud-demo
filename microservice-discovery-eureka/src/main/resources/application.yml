@@ -1,0 +1,17 @@
+server:
+  port: 8761
+eureka:
+  client:
+    service-url:
+      defaultZone: http://user:password@${eureka.instance.hostname}:${server.port}/eureka
+    register-with-eureka: false       # 是否将自己注册到 Eureka Server
+    fetch-registry: false             # 是否从 Eureka Server 获取注册信息
+  instance:
+    hostname: localhost
+# eureka 账户&密码
+security:
+  user:
+    name: user
+    password: password
+  basic:
+    enabled: true

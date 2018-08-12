@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: spring-cloud-eureka
+  profiles: instance3
+server:
+  port: 8083
+eureka:
+  client:
+    service-url:
+      defaultZone: http://instance1:8081/eureka,http://instance2:8082/eureka
+  instance:
+    hostname: instance3

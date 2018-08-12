@@ -1,0 +1,28 @@
+server:
+  port: 7901
+spring:
+  jpa:
+    generate-ddl: false
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+  datasource:
+    platform: h2
+    schema: classpath:/schema.sql
+    data: classpath:/data.sql
+  application:
+    name: microservice-provider-user
+logging:
+  level:
+    root: INFO
+    org.hibernate: INFO
+    org.hibernate.type.description.sql.BasicBinder: TRACE
+    org.hibernate.type.description.sql.BasicExtractor: TRACE
+    org.destiny: DEBUG
+eureka:
+  client:
+    service-url:
+      defauleZone: http://user:password@localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ipAddress}:${spring.application.instance_id:${server.port}}

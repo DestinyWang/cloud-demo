@@ -1,0 +1,15 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://user:password@localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${spring.cloud.client.ipAddress}:${spring.application.instance_id:${server.port}}
+server:
+  port: 7902
+spring:
+  application:
+    name: microservice-consumer-movie-ribbon-properties
+microservice-provider-user:
+  ribbon:
+    # 负载均衡规则: 响应时间加权
+    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule

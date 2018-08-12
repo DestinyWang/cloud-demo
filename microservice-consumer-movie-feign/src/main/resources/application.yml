@@ -1,0 +1,12 @@
+eureka:
+  client:
+    service-url:
+      defauleZone: http://user:password@localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ipAddress}:${spring.application.instance_id:${server.port}}
+server:
+  port: 7901
+spring:
+  application:
+    name: microservice-consumer-movie-feign
