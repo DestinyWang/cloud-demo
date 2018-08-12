@@ -2,9 +2,11 @@ package org.destiny.cloud.microserviceconsumermovie.controller;
 
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
+import org.destiny.cloud.microserviceconsumermovie.feign.TestFeignClient;
 import org.destiny.cloud.microserviceconsumermovie.feign.UserFeignClient;
 import org.destiny.cloud.microserviceconsumermovie.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -21,6 +23,10 @@ public class MovieController {
     private UserFeignClient userFeignClient;
 
     @Autowired
+    private TestFeignClient testFeignClient;
+
+    @Qualifier("eurekaClient")
+    @Autowired
     private EurekaClient eurekaClient;
 
     @GetMapping("/movie/{id}")
@@ -32,5 +38,10 @@ public class MovieController {
     public String health() {
         InstanceInfo server = eurekaClient.getNextServerFromEureka("microservice-provider-user", false);
         return server.getHostName() + ": " + server.getPort();
+    }
+
+    @GetMapping("/{serviceName}")
+    public String findByServiceName(@PathVariable("serviceName") String serviceName) {
+        return testFeignClient.findByServiceName(serviceName);
     }
 }

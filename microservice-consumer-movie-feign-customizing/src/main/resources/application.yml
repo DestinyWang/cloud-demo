@@ -10,3 +10,6 @@ server:
 spring:
   application:
     name: microservice-consumer-movie-feign
+logging:
+  level:
+    org.destiny.cloud.microserviceconsumermovie.feign: DEBUG
