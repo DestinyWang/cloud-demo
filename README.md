@@ -614,3 +614,105 @@ public interface UserFeignClient {
 #### 请求成功
 ![](http://oetw0yrii.bkt.clouddn.com/18-8-12/81898817.jpg)
 
+## 4.3 覆写 Feign 配置文件
+
+#### 修改配置类以设置日志级别
+```java
+@Configuration
+public class FeignConfiguration {
+
+    /**
+     * 将默认的 SpringMVC 契约替换成 Feign 缺省契约
+     * @return
+     */
+    @Bean
+    public Contract feignContract() {
+        return new feign.Contract.Default();
+    }
+
+    /**
+     * 为请求统一添加用户名密码
+     * @return
+     */
+    @Bean
+    public BasicAuthRequestInterceptor basicAuthRequestInterceptor() {
+        return new BasicAuthRequestInterceptor("user", "password");
+    }
+
+    /**
+     * 设置 feign 日志级别
+     * @return
+     */
+    @Bean
+    public Logger.Level feignLoggerLevel() {
+        return Logger.Level.BASIC;
+    }
+}
+
+```
+
+## 4.5 解决 Feign 第一次请求 timeout 的问题
+```
+# 设置超时时间
+hystrix:command.default.execution.isolation.thread.timeoutInMilliseconds: 5000
+# 禁用超时时间
+hystrix.command.default.execution.timeout.enable: false
+# 直接禁用 hystrix
+hystrix:
+  metrics:
+    enabled: false
+```
+
+# 5. 深入理解 Eureka
+## 5.1 元数据
+- 主机名
+- IP 地址
+- 端口
+- 状态页
+- 健康检查
+
+等元数据都会发布在服务注册表, 并由客户端以直接的方式联系服务.
+
+其他原数据可以添加到 `eureka.instance.metadatamap` 中的实例注册, 并且可以在远程客户端中访问, 除非 Eureka 知道元数据的含义, 否则不会更改客户端的行为
+
+#### 改变 instanceId
+```
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.cloud.client.ipAddress}:${spring.application.instance_id:${server.port}}
+
+```
+
+#### 自定义元数据
+修改配置
+```
+eureka:
+  client:
+    service-url:
+      defauleZone: http://user:password@localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ipAddress}:${spring.application.instance_id:${server.port}}
+    metadata-map:
+      zone: ABC     # eureka.instance.metadata-map.zone 是 Eureka 自身可识别的配置
+      name: destiny
+```
+
+登录 `http://localhost:8761/eureka/apps/microservice-provider-user` 即可看到:
+
+![](http://oetw0yrii.bkt.clouddn.com/18-8-16/55822718.jpg)
+
+# 6. Hystrix
+在微服务架构中通常会有多个服务层调用, 大量微服务通过网络进行通信, 从而支撑起整个系统.
+
+各个微服务之间也难免存在大量的依赖关系, 然而任何服务都不是 100% 可用的, 网络也往往是脆弱的, 所以难免有一些请求会失败, 基础服务的故障导致级联故障, 进而导致整个系统不可用, 这种现象称为雪崩效应.
+
+雪崩效应的描述是一种因服务提供者的不可用导致服务消费者不可用, 并将不可用逐渐放大的效应.
+
+解决方案:
+- 超时机制: 通过网络请求其他服务的时候, 都必须设置超时时间, 正常情况下, 一个远程调用在十几毫秒内就返回了, 当依赖的服务有问题, 响应时间变得很长, 对调用方而言, 就会有大量的进程/线程被挂起, 消耗大量资源.
+- 断路器: 当依赖的服务有大量超时的时候, 再去让新的请求访问已经没有意义, 只会无谓的消耗资源. 断路器可以实现快速失败, 如果在一段时间内侦测到许多类似的错误, 就会强迫其后的请求快速失败, 断路器也可以使应用程序能够诊断错误是否已经修正, 如果已经修正, 应用程序会再次尝试调用.
+
+![](http://oetw0yrii.bkt.clouddn.com/18-8-16/37109863.jpg)
+
+## 6.1 引入 Hystrix
