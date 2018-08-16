@@ -26,3 +26,6 @@ eureka:
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${spring.cloud.client.ipAddress}:${spring.application.instance_id:${server.port}}
+    metadata-map:
+#      zone: ABC     # eureka.instance.metadata-map.zone 是 Eureka 自身可识别的配置, 可能会影响客户端行为
+      name: destiny # 不会影响客户端行为

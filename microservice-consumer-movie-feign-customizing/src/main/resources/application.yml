@@ -13,3 +13,12 @@ spring:
 logging:
   level:
     org.destiny.cloud.microserviceconsumermovie.feign: DEBUG
+
+# 设置超时时间
+#hystrix:command.default.execution.isolation.thread.timeoutInMilliseconds: 5000
+# 禁用超时时间
+#hystrix.command.default.execution.timeout.enable: false
+# 直接禁用 hystrix
+#hystrix:
+#  metrics:
+#    enabled: false
